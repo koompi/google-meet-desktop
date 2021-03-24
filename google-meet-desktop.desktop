@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Google Meet
+Comment=Google Meet desktop built with nativefier (electron)
+Exec=/usr/bin/google-meet-desktop
+Icon=/usr/share/icons/google-meet-desktop.png
+Encoding=UTF-8
+Terminal=false
+StartupNotify=true
+Type=Application
+Categories=Education;Application;
