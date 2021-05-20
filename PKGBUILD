@@ -1,50 +1,52 @@
-#Maintainer: CrankySupertoon <crankysupertoon@gmail.com>
+# Maintainer: Pichponereay NGOR <isaacjacksonreay at gmail dot com>
 
 pkgname=google-meet-desktop
-pkgver=1.2.0
+pkgver=2.0.0
 pkgrel=1
 pkgdesc="Google Meets desktop built with electron"
-arch=("x86_64")
-license=("custom")
-makedepends=("gendesk")
-depends=("electron" "yarn" "npm")
-source_x86_64=("icon.png::https://www.gstatic.com/images/branding/product/2x/meet_64dp.png"
-	       "https://github.com/arjun-g/google-meet-desktop/archive/v1.2.0.tar.gz")
-md5sums_x86_64=('SKIP' 'SKIP')
-conflicts=('google-meet-nativefier')
+arch=("any")
+license=("MIT")
+url='https://meet.google.com'
+depends=("nodejs" "npm" "unzip")
+source=(
+  "${pkgname}.png"
+  "${pkgname}.desktop"
+)
+sha256sums=(
+  "8fad9e94012e93e8f1a1ea70aa5a47a23135687a2341c99451ed27d2306c7a9f"
+  "281c5d311e4b8bd67bf1bc576c93a5e22274f2c8e5392d2219e2958660954318"
+)
 
 build() {
-  cd "${srcdir}/google-meet-desktop-${pkgver}"
-  yarn
-  npx electron-builder --linux dir
+  cd "${srcdir}"
+  npm i -g nativefier
+
+  nativefier \
+    --name "Google Meet" \
+    --icon "${pkgname}.png" \
+    --user-agent 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4464.5 Safari/537.36' \
+    --verbose \
+    --internal-urls "(.*?meet\.google\.com.*?|.*?accounts\.google\.com.*?)" \
+    --single-instance \
+    "${url}"
 }
 
-prepare() {
-    # Generate .desktop
-    gendesk --pkgname "Google Meets" --pkgdesc "${pkgdesc}" --icon ${pkgname} --exec "/usr/bin/${pkgname}" -n -f
-    mv "Google Meets.desktop" "${pkgname}.desktop"
-}
+
 
 package() {
-    # install the main files.
-    install -d -m755 "${pkgdir}/opt/${pkgname}"
-    cp -Rr "${srcdir}/${pkgname}-${pkgver}/dist/linux-unpacked/"* "${pkgdir}/opt/${pkgname}"
 
-    # desktop entry
-    install -D -m644 "${srcdir}/${pkgname}.desktop" "${pkgdir}/usr/share/applications/${pkgname}.desktop"
+  # install main file
+  install -d -m755 "${pkgdir}"/opt
+  cp -Rr "${srcdir}"/GoogleMeet* "${pkgdir}"/opt/GoogleMeet
 
-    # install the icon
-    install -d -m755 "${pkgdir}/usr/share/icons"
-    cp -Rr "${srcdir}/icon.png" "${pkgdir}/usr/share/icons/${pkgname}.png"
+  chmod +x "${pkgdir}"/opt/GoogleMeet/GoogleMeet
 
-    # fix file permissions - all files as 644 - directories as 755
-    find "${pkgdir}/"{opt,usr} -type d -exec chmod 755 {} \;
-    find "${pkgdir}/"{opt,usr} -type f -exec chmod 644 {} \;
+  # intall desktop Entry
+  install -D -m644 "${pkgname}".desktop "${pkgdir}"/usr/share/applications/"${pkgname}".desktop
 
-    # make sure the main binary has the right permissions
-    chmod +x "${pkgdir}/opt/${pkgname}/${pkgname}"
-
-    # link the binary
-    install -d -m755 "${pkgdir}/usr/bin"
-    ln -sr "${pkgdir}/opt/${pkgname}/${pkgname}" "${pkgdir}/usr/bin/${pkgname}"
+  # install icon
+  install -D -m755 "${srcdir}"/"${pkgname}.png" "${pkgdir}"/usr/share/icons/GoogleMeet/"${pkgname}.png"    # link the binary
+  
+  install -d -m755 "${pkgdir}/usr/bin"
+  ln -sr "${pkgdir}/opt/GoogleMeet/GoogleMeet" "${pkgdir}/usr/bin/${pkgname}"
 }

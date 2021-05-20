@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Google Meets
+Comment=Google Meets desktop built with electron nativefier
+Exec=/usr/bin/google-meet-desktop
+Icon=/usr/share/icons/GoogleMeet/google-meet-desktop.png
+Terminal=false
+StartupNotify=false
+Categories=Application;
